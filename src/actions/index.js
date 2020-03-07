@@ -6,6 +6,10 @@ export const SEARCH_MOVIES = "SEARCH_MOVIES";
 export const LOAD_MORE_MOVIES = "LOAD_MORE_MOVIES";
 export const CLEAR_MOVIES = "CLEAR_MOVIES";
 
+// Action types for Movie
+export const GET_MOVIE = "GET_MOVIE";
+export const CLEAR_MOVIE = "CLEAR_MOVIE";
+
 // Action types shared between Home and Movies
 export const SHOW_LOADING_SPINNER = "SHOW_LOADING_SPINNER";
 
@@ -84,6 +88,49 @@ export function loadMoreMovies(searchTerm, currentPage) {
 export function clearMovies() {
   return {
     type: CLEAR_MOVIES,
+    payload: null
+  };
+}
+
+// Action Creators for Movie
+export function getMovie(movieId) {
+  let endpoint = `${API_URL}movie/${movieId}?api_key=${API_KEY}&language=en-US`;
+  let newState = {};
+
+  const request = fetch(endpoint)
+    .then(result => result.json())
+    .then(result => {
+      if (result.status_code) {
+        // If we don't find any movie
+        return newState;
+      } else {
+        newState = { movie: result };
+        // ... then fetch actors in the setState callback function
+        endpoint = `${API_URL}movie/${movieId}/credits?api_key=${API_KEY}`;
+        return fetch(endpoint)
+          .then(result => result.json())
+          .then(result => {
+            const directors = result.crew.filter(
+              member => member.job === "Director"
+            );
+            newState.actors = result.cast;
+            newState.directors = directors;
+
+            return newState;
+          });
+      }
+    })
+    .catch(error => console.error("Error:", error));
+
+  return {
+    type: GET_MOVIE,
+    payload: request
+  };
+}
+
+export function clearMovie() {
+  return {
+    type: CLEAR_MOVIE,
     payload: null
   };
 }
