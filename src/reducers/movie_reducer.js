@@ -13,6 +13,7 @@ const defaultState = {
 };
 
 export default function(state = defaultState, action) {
+  console.log("Inside movie reducer --> ", state);
   switch (action.type) {
     case SET_MOVIE_PERSISTED_STATE:
       return {

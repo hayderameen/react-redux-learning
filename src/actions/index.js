@@ -131,7 +131,7 @@ export function getMovie(movieId) {
             );
             newState.actors = result.cast;
             newState.directors = directors;
-
+            console.log("Movie --> ", newState);
             return newState;
           });
       }

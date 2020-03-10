@@ -11,20 +11,26 @@ import Movie from "../components/Movie/Movie";
 
 class MovieContainer extends Component {
   componentDidMount() {
+    console.log("CDM Launched!");
     const { movieId } = this.props.match.params;
 
     if (sessionStorage.getItem(`${movieId}`)) {
       this.props.setMoviePersistedState(
         JSON.parse(sessionStorage.getItem(`${movieId}`))
       );
-    } else this.getMovie(movieId);
+    } else {
+      this.getMovie(movieId);
+    }
   }
 
   componentDidUpdate() {
     const { movieId } = this.props.match.params;
-    if (!sessionStorage.getItem(`${movieId}`)) {
-      sessionStorage.setItem(`${movieId}`, JSON.stringify(this.props));
-    }
+    if (this.props.movie) {
+      console.log("Now saving movie in Session Storage");
+      if (!sessionStorage.getItem(`${movieId}`)) {
+        sessionStorage.setItem(`${movieId}`, JSON.stringify(this.props));
+      }
+    } else console.log("Not saving movie now");
   }
 
   getMovie = movieId => {

@@ -39,7 +39,10 @@ export default function(state = defaultState, action) {
         searchTerm: ""
       };
     case LOAD_MORE_MOVIES:
-      console.log("Inside reducer of load more movies! and state is: ", state);
+      console.log(
+        "Inside reducer of load more movies! and state is: ",
+        state.movie
+      );
       return {
         ...state,
         movies: [...state.movies, ...action.payload.results],
