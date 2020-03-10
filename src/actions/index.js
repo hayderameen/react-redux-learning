@@ -5,10 +5,12 @@ export const GET_POPULAR_MOVIES = "GET_POPULAR_MOVIES";
 export const SEARCH_MOVIES = "SEARCH_MOVIES";
 export const LOAD_MORE_MOVIES = "LOAD_MORE_MOVIES";
 export const CLEAR_MOVIES = "CLEAR_MOVIES";
+export const SET_POPULAR_PERSISTED_STATE = "SET_POPULAR_PERSISTED_STATE";
 
 // Action types for Movie
 export const GET_MOVIE = "GET_MOVIE";
 export const CLEAR_MOVIE = "CLEAR_MOVIE";
+export const SET_MOVIE_PERSISTED_STATE = "SET_MOVIE_PERSISTED_STATE";
 
 // Action types shared between Home and Movies
 export const SHOW_LOADING_SPINNER = "SHOW_LOADING_SPINNER";
@@ -23,6 +25,13 @@ export function showLoadingSpinner() {
 }
 
 // Action creators for Home
+export function setPopularPersistedState(state) {
+  return {
+    type: SET_POPULAR_PERSISTED_STATE,
+    payload: state
+  };
+}
+
 export function getPopularMovies() {
   const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
   const request = fetch(endpoint)
@@ -93,6 +102,13 @@ export function clearMovies() {
 }
 
 // Action Creators for Movie
+export function setMoviePersistedState(state) {
+  return {
+    type: SET_MOVIE_PERSISTED_STATE,
+    payload: state
+  };
+}
+
 export function getMovie(movieId) {
   let endpoint = `${API_URL}movie/${movieId}?api_key=${API_KEY}&language=en-US`;
   let newState = {};

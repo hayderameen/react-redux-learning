@@ -5,15 +5,27 @@ import {
   searchMovies,
   loadMoreMovies,
   clearMovies,
-  showLoadingSpinner
+  showLoadingSpinner,
+  setPopularPersistedState
 } from "../actions";
 import Home from "../components/Home/Home";
 import { render } from "react-dom";
 
 class HomeContainer extends Component {
   componentDidMount() {
-    this.getMovies();
-    console.log("ComponentDidMount done!");
+    if (sessionStorage.getItem("HomeState")) {
+      const home = JSON.parse(sessionStorage.getItem("HomeState"));
+      this.props.setPopularPersistedState(home);
+    } else {
+      this.getMovies();
+      console.log("ComponentDidMount done!");
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.movies.length > 0 && this.props.searchTerm === "") {
+      sessionStorage.setItem("HomeState", JSON.stringify(this.props));
+    }
   }
 
   getMovies = () => {
@@ -58,7 +70,8 @@ const mapDispatchToProps = {
   searchMovies,
   loadMoreMovies,
   clearMovies,
-  showLoadingSpinner
+  showLoadingSpinner,
+  setPopularPersistedState
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeContainer);
