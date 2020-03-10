@@ -15,6 +15,7 @@ class MovieContainer extends Component {
     const { movieId } = this.props.match.params;
 
     if (sessionStorage.getItem(`${movieId}`)) {
+      console.log("Loading this movie from storage--> ", movieId);
       this.props.setMoviePersistedState(
         JSON.parse(sessionStorage.getItem(`${movieId}`))
       );
@@ -28,7 +29,11 @@ class MovieContainer extends Component {
     if (this.props.movie) {
       console.log("Now saving movie in Session Storage");
       if (!sessionStorage.getItem(`${movieId}`)) {
-        sessionStorage.setItem(`${movieId}`, JSON.stringify(this.props));
+        const { movie, directors, actors } = this.props;
+        sessionStorage.setItem(
+          `${movieId}`,
+          JSON.stringify({ movie, directors, actors })
+        );
       }
     } else console.log("Not saving movie now");
   }
