@@ -1,4 +1,5 @@
 import { API_URL, API_KEY } from "../config";
+import { fetchMovies } from "../helpers";
 
 // Action types for Home
 export const GET_POPULAR_MOVIES = "GET_POPULAR_MOVIES";
@@ -34,12 +35,8 @@ export function setPopularPersistedState(state) {
 
 export function getPopularMovies() {
   const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
-  const request = fetch(endpoint)
-    .then(result => result.json())
-    .then(result => {
-      return result;
-    })
-    .catch(error => console.error("Error:", error));
+  const request = fetchMovies(endpoint);
+
   console.log("Action of Get Movies completed!");
   return {
     type: GET_POPULAR_MOVIES,
@@ -55,12 +52,9 @@ export function searchMovies(searchTerm) {
     endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${searchTerm}`;
   }
 
-  const request = fetch(endpoint)
-    .then(result => result.json())
-    .then(result => {
-      return { ...result, searchTerm };
-    })
-    .catch(error => console.error("Error:", error));
+  const request = fetchMovies(endpoint, result => {
+    return { ...result, searchTerm };
+  });
 
   return {
     type: SEARCH_MOVIES,
@@ -80,12 +74,7 @@ export function loadMoreMovies(searchTerm, currentPage) {
       1}`;
   }
 
-  const request = fetch(endpoint)
-    .then(result => result.json())
-    .then(result => {
-      return result;
-    })
-    .catch(error => console.error("Error:", error));
+  const request = fetchMovies(endpoint);
 
   console.log("Action of load more movies completed", request);
   return {
@@ -113,30 +102,25 @@ export function getMovie(movieId) {
   let endpoint = `${API_URL}movie/${movieId}?api_key=${API_KEY}&language=en-US`;
   let newState = {};
 
-  const request = fetch(endpoint)
-    .then(result => result.json())
-    .then(result => {
-      if (result.status_code) {
-        // If we don't find any movie
+  const request = fetchMovies(endpoint, result => {
+    if (result.status_code) {
+      return newState; // No movie found
+    } else {
+      newState = { movie: result };
+      // ... then fetch actors in the setState callback function
+      endpoint = `${API_URL}movie/${movieId}/credits?api_key=${API_KEY}`;
+
+      return fetchMovies(endpoint, result => {
+        const directors = result.crew.filter(
+          member => member.job === "Director"
+        );
+        newState.actors = result.cast;
+        newState.directors = directors;
+        console.log("Movie --> ", newState);
         return newState;
-      } else {
-        newState = { movie: result };
-        // ... then fetch actors in the setState callback function
-        endpoint = `${API_URL}movie/${movieId}/credits?api_key=${API_KEY}`;
-        return fetch(endpoint)
-          .then(result => result.json())
-          .then(result => {
-            const directors = result.crew.filter(
-              member => member.job === "Director"
-            );
-            newState.actors = result.cast;
-            newState.directors = directors;
-            console.log("Movie --> ", newState);
-            return newState;
-          });
-      }
-    })
-    .catch(error => console.error("Error:", error));
+      });
+    }
+  });
 
   return {
     type: GET_MOVIE,
